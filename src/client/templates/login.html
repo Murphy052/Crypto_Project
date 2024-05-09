@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form method="post">
+      <h1>Sign in</h1>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          spellcheck="false"
+          required
+          placeholder="Username"
+          autocomplete="off"
+        />
+        <label for="password">Password</label>
+        <input
+          type="password"
+          required
+          placeholder="Password"
+          autocomplete="off"
+        />
+        <button
+          type="submit"
+          class="submitbtn"
+          onclick="location.href='./userlist.html'"
+        >
+          Login
+        </button>
+      </div>
+    </form>
+
+{% endblock %}
