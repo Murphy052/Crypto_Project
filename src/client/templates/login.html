@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form method="post">
+<form method="post" id="loginForm">
       <h1>Sign in</h1>
       <div class="form-group">
         <label for="username">Username</label>
         <input
           type="text"
           id="username"
+          name="username"
           spellcheck="false"
           required
           placeholder="Username"
@@ -16,6 +17,8 @@
         <label for="password">Password</label>
         <input
           type="password"
+          id="password"
+          name="password"
           required
           placeholder="Password"
           autocomplete="off"
@@ -23,11 +26,47 @@
         <button
           type="submit"
           class="submitbtn"
-          onclick="location.href='./userlist.html'"
         >
           Login
         </button>
       </div>
     </form>
+
+<script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+
+            // Get the current URL
+            var currentUrl = window.location.href;
+
+            // Parse the URL to extract the domain
+            var urlObject = new URL(currentUrl);
+            var domain = urlObject.hostname;
+
+            fetch(`http://localhost:8000/api/v1/user/login`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json()) // Parse response as JSON
+                .then(data => {
+                    // Check if access_token exists in the response
+                    if (data.access_token) {
+                        // Save access_token to cookies
+                        document.cookie = `authorization=${data.token_type} ${data.access_token}; path=/;`;
+                        // Redirect to desired page after successful login
+                        window.location.href = '/board'; // Change to your desired dashboard page
+                    } else {
+                        // Display login error message
+                        document.getElementById('error-message').innerText = data.detail || 'An error occurred during login.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle other errors
+                    // document.getElementById('error-message').innerText = 'An error occurred during login.';
+                });
+        });
+    </script>
 
 {% endblock %}

@@ -16,7 +16,6 @@ def verify_password(plain_password, hashed_password):
 @if_fails(message="Incorrect username or password")
 def authenticate_user(state):
     state.user = user_repository.get_user(username=state.username)
-    print(state.user)
     if not state.user:
         return None
     if not verify_password(state.password, state.user.password):
