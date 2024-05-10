@@ -1,14 +1,23 @@
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.websockets import WebSocketDisconnect
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 from starlette.authentication import UnauthenticatedUser
 
 from src.core.middleware import auth_required
 from src.db.repositories import user_repository
+from src.schemas.user import User
 
 templates = Jinja2Templates(directory="src/client/templates")
 
 router = APIRouter()
+
+
+@router.get("/")
+async def get_main(request: Request):
+    if isinstance(request.user, User):
+        return RedirectResponse(url="/board")
+    return RedirectResponse(url="/login")
 
 
 class ConnectionManager:
@@ -83,5 +92,6 @@ async def render_login(request: Request):
 
 
 @router.get("/chat")
+@auth_required
 async def render_chat(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})

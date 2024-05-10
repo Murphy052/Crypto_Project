@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.staticfiles import StaticFiles
 
@@ -8,16 +7,15 @@ from contextlib import asynccontextmanager
 
 from src.api import routes
 from src.client.render import router as render
+from src.api.kdc.kdc_api import router as kdc_router
 from src.core import settings
-from src.core.tools import RSA
 from src.db import db
-from src.core.middleware import AuthBackend
-from src.schemas.user import User
+from src.core.middleware import AuthBackend, auth_required
+from src.db.repositories import public_keys_repository, user_repository
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # app.rsa = RSA(1024)
     yield
     db.close()
 
@@ -36,18 +34,13 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="src/client/static"), name="static")
 
 
-@app.get("/")
-def get_main(request: Request):
-    if isinstance(request.user, User):
-        return RedirectResponse(url="/board")
-    return RedirectResponse(url="/login")
-
-
-# @app.get("/public-key")
-# def get_public_key():
-#     print(app.rsa.public_key)
-#     return str(app.rsa.public_key[0]), str(app.rsa.public_key[1])
+@app.get("/test")
+@auth_required
+async def test_endpoint(request: Request):
+    return public_keys_repository.get_obj_or_none(user_id=request.user.user_id)
 
 
 app.include_router(routes, tags=["api"])
 app.include_router(render, tags=["client"])
+app.include_router(kdc_router, tags=["kdc"])
+
