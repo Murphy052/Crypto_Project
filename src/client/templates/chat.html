@@ -14,33 +14,37 @@
       </div>
       <div class="chat">
         <h2>Room Chat</h2>
-        <div class="chatText"></div>
+        <div class="chatText" id="chatText">
+          <h2 class="welcome">Welcome to the Chat Room</h2>
+        </div>
       </div>
       <div class="chatControls">
         <div class="inputPanel">
           <input id="textInput" type="text" placeholder="Enter Message" />
-          <button>Send</button>
+          <button id="sendButton">Send</button>
         </div>
       </div>
     </div>
     <script>
-            var ws = new WebSocket(`ws://localhost:8000/chat`);
-            ws.onmessage = function(event) {
-                // var messages = document.getElementById('messages')
-                // var message = document.createElement('li')
-                // var content = document.createTextNode(event.data)
-                // message.appendChild(content)
-                // messages.appendChild(message)
-                console.log(event.data)
-            };
-            let inputPanel = document.getElementById("textInput")
-            inputPanel.addEventListener("keypress", e => {
-              if (e.key === "Enter") {
-                ws.send(inputPanel.value);
-                console.log(inputPanel.value);
-                inputPanel.value = ""
-              }
-            })
+      var ws = new WebSocket(`ws://localhost:8000/chat`);
+      const chat = document.getElementById("chatText");
+      const sendButton = document.getElementById("sendButton");
+      let inputPanel = document.getElementById("textInput");
+      inputPanel.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          if (inputPanel.value === "") return;
+          ws.send(inputPanel.value);
+          chat.innerHTML += `<p class="sender"> ${inputPanel.value} </p>`;
+          inputPanel.value = "";
+        }
+      });
+
+      sendButton.addEventListener("click", () => {
+        if (inputPanel.value === "") return;
+        ws.send(inputPanel.value);
+        chat.innerHTML += `<p class="sender"> ${inputPanel.value} </p>`;
+        inputPanel.value = "";
+      });
     </script>
   </body>
 </html>

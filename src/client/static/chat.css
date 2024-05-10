@@ -92,3 +92,25 @@ button:active::after {
   left: 0;
   right: 0;
 }
+
+.sender {
+  background-color: hsl(20, 4%, 17%);
+  display: flex;
+  align-items: center;
+  padding-left: 50px;
+  font-size: 18px;
+  height: 50px;
+}
+
+.receiver {
+  background-color: #494646;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 50px;
+  height: 50px;
+}
+
+.welcome {
+  padding-top: 20px;
+}
