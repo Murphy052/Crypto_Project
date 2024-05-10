@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/chat.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="users">
+        <h2>Users in Chat</h2>
+        <div class="userList"></div>
+      </div>
+      <div class="chat">
+        <h2>Room Chat</h2>
+        <div class="chatText"></div>
+      </div>
+      <div class="chatControls">
+        <div class="inputPanel">
+          <input type="text" placeholder="Enter Message" />
+          <button>Send</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

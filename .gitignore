@@ -1,4 +1,6 @@
 .idea
 **/__pycache__/**
 **.env
-venv
+/venv
+.vscode
+pyvenv.cfg

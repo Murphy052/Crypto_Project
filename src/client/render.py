@@ -55,9 +55,16 @@ async def render_board(request: Request):
     users_data = [conn.user.__dict__ for conn in manager.active_connections]
 
     print(users_data)
-    return templates.TemplateResponse("board.html", {"request": request, "data": users_data})
+    return templates.TemplateResponse(
+        "board.html", {"request": request, "data": users_data}
+    )
 
 
 @router.get("/login")
 async def render_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
+
+
+@router.get("/chat")
+async def render_chat(request: Request):
+    return templates.TemplateResponse("chat.html", {"request": request})
