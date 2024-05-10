@@ -31,6 +31,7 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+chat = ConnectionManager()
 
 
 @router.websocket("/ws")
@@ -47,6 +48,22 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await manager.broadcast(f"Client #{websocket.user.username} left the chat")
+
+
+@router.websocket("/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    if isinstance(websocket.user, UnauthenticatedUser):
+        return
+
+    await chat.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await chat.send_personal_message(f"You wrote: {data}", websocket)
+            await chat.broadcast(f"Client #{websocket.user.username} says: {data}")
+    except WebSocketDisconnect:
+        chat.disconnect(websocket)
+        await chat.broadcast(f"Client #{websocket.user.username} left the chat")
 
 
 @router.get("/board")

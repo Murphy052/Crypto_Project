@@ -18,10 +18,29 @@
       </div>
       <div class="chatControls">
         <div class="inputPanel">
-          <input type="text" placeholder="Enter Message" />
+          <input id="textInput" type="text" placeholder="Enter Message" />
           <button>Send</button>
         </div>
       </div>
     </div>
+    <script>
+            var ws = new WebSocket(`ws://localhost:8000/chat`);
+            ws.onmessage = function(event) {
+                // var messages = document.getElementById('messages')
+                // var message = document.createElement('li')
+                // var content = document.createTextNode(event.data)
+                // message.appendChild(content)
+                // messages.appendChild(message)
+                console.log(event.data)
+            };
+            let inputPanel = document.getElementById("textInput")
+            inputPanel.addEventListener("keypress", e => {
+              if (e.key === "Enter") {
+                ws.send(inputPanel.value);
+                console.log(inputPanel.value);
+                inputPanel.value = ""
+              }
+            })
+    </script>
   </body>
 </html>
