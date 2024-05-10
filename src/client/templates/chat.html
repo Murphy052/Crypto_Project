@@ -30,6 +30,9 @@
       const chat = document.getElementById("chatText");
       const sendButton = document.getElementById("sendButton");
       let inputPanel = document.getElementById("textInput");
+      ws.onmessage = function (event) {
+        chat.innerHTML += `<p class="receiver"> ${event.data} </p>`;
+      };
       inputPanel.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
           if (inputPanel.value === "") return;
