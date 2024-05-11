@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from src.api import routes
 from src.client.render import router as render
 from src.api.kdc.kdc_api import router as kdc_router
+from src.api.kdc.websocket import router as websocket
 from src.core import settings
 from src.db import db
 from src.core.middleware import AuthBackend, auth_required
@@ -43,4 +44,4 @@ async def test_endpoint(request: Request):
 app.include_router(routes, tags=["api"])
 app.include_router(render, tags=["client"])
 app.include_router(kdc_router, tags=["kdc"])
-
+app.include_router(websocket)

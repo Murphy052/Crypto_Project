@@ -6,4 +6,5 @@ rsa = RSA(1024)
 __all__ = (
     "MathTools",
     "rsa",
+    "RSA",
 )

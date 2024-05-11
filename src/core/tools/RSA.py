@@ -14,6 +14,10 @@ class RSA:
     def public_key(self) -> Tuple[int, int]:
         return self._public_key
 
+    @property
+    def private_key(self) -> Tuple[int, int]:
+        return self._private_key
+
     def _generate_keys(self, p: int, q: int):
         n: int = p * q
         phi: int = (p - 1) * (q - 1)
@@ -35,6 +39,20 @@ class RSA:
     def decrypt(self, cipher: str):
         integer = int(cipher)
         integer = MathTools.fast_exponentiation(integer, self._private_key[0], self._private_key[1])
+        bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
+        return bytesarray.decode('UTF-8')
+
+    @staticmethod
+    def encrypt_with_key(text: str, key: Tuple[int, int]):
+        bytesarray = bytearray(text.encode('UTF-8'))
+        integer = int.from_bytes(bytesarray, byteorder='big', signed=False)
+        r = MathTools.fast_exponentiation(integer, key[0], key[1])
+        return r
+
+    @staticmethod
+    def decrypt_with_key(cipher: str, key: Tuple[int, int]):
+        integer = int(cipher)
+        integer = MathTools.fast_exponentiation(integer, key[0], key[1])
         bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
         return bytesarray.decode('UTF-8')
 

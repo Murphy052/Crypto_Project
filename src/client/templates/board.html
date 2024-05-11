@@ -8,30 +8,49 @@
   </head>
   <body>
     <h2>Active Users</h2>
-    <div class="users">
+    <div class="users" id="users">
       {% for item in data %}
-        <div class="user">
+        <div class="user {{ item['username'] }}-el">
           <h4>{{ item["username"] }}</h4>
-          <button>Join</button>
+          <button class="join" id=" {{ item['username'] }} " >Join</button>
         </div>
-        <hr />
+        <hr class="{{ item['username'] }}-el"/>
       {% endfor %}
     </div>
 
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', path='/get_public_keys.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', path='/localstg.js') }}"></script>
     <script>
             var ws = new WebSocket(`ws://localhost:8000/ws`);
-            ws.onmessage = function(event) {
-                // var messages = document.getElementById('messages')
-                // var message = document.createElement('li')
-                // var content = document.createTextNode(event.data)
-                // message.appendChild(content)
-                // messages.appendChild(message)
-                console.log(event.data)
+            ws.onopen = function(event) {
+                ws.send(`{{ mson|safe }}`);
             };
-        </script>
+            ws.onmessage = function(event) {
+                data = JSON.parse(event.data)
 
-<!--  <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>-->
-<!--  <script type="text/javascript" src="{{ url_for('static', path='/rsa.js') }}"></script>-->
+                if (data["method"] === "user_conn") {
+                  document.querySelector("#users").innerHTML += `
+                  <div class="user ${data["payload"]}-el">
+                    <h4>${data["payload"]}</h4>
+                    <button class="join" id="${data["payload"]}">Join</button>
+                  </div>
+                  <hr class="${data["payload"]}-el" />
+                  `;
+                } else if (data["method"] === "user_disconn") {
+                  let elements = document.querySelectorAll(`.${data["payload"]}-el`);
+                  elements.forEach(element => {
+                    element.remove();
+                  });
+                }
+
+                console.log(event.data)
+
+            };
+            
+            removeDataOnUnload("serverPublicKeys");
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', path='/join.js') }}"></script>
 
   </body>
 </html>
