@@ -10,6 +10,6 @@ class PublicKeys:
 
 
 @dataclass
-class PublicKeysResponseSchema:
+class PublicKeySchema:
     public_key_exp: int
     public_key_n: str

@@ -54,6 +54,7 @@
                     if (data.access_token) {
                         // Save access_token to cookies
                         document.cookie = `authorization=${data.token_type} ${data.access_token}; path=/;`;
+                        localStorage.setItem("username", document.getElementById("username").value)
                         // Redirect to desired page after successful login
                         window.location.href = '/board'; // Change to your desired dashboard page
                     } else {

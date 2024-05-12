@@ -58,19 +58,24 @@ async def websocket_endpoint(websocket: WebSocket):
             print(data)
             try:
                 s_data = MSON(**(json.loads(data)))
-
-                match s_data.method:
-                    case "connect":
-                        dest: WebSocket = manager.get_connection(s_data.dest)
-                        await manager.send_personal_message(data, dest)
-                    case "user_conn":
-                        await manager.broadcast(
-                            json.dumps(
-                                MSON(method="user_conn", payload=f"{websocket.user.username}").__dict__,
-                                indent=0
-                            ),
-                            black_listed=websocket
-                        )
+                print([w.user for w in manager.active_connections])
+                if s_data.method == "connect":
+                    dest: WebSocket = manager.get_connection(s_data.dest)
+                    await manager.send_personal_message(data, dest)
+                elif s_data.method == "confirm":
+                    dest: WebSocket = manager.get_connection(s_data.dest)
+                    await manager.send_personal_message(data, dest)
+                elif s_data.method == "justify":
+                    dest: WebSocket = manager.get_connection(s_data.dest)
+                    await manager.send_personal_message(data, dest)
+                elif s_data.method == "user_conn":
+                    await manager.broadcast(
+                        json.dumps(
+                            MSON(method="user_conn", payload=f"{websocket.user.username}").__dict__,
+                            indent=0
+                        ),
+                        black_listed=websocket
+                    )
             except:
                 pass
     except WebSocketDisconnect:

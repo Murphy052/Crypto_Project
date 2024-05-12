@@ -12,7 +12,7 @@
       {% for item in data %}
         <div class="user {{ item['username'] }}-el">
           <h4>{{ item["username"] }}</h4>
-          <button class="join" id=" {{ item['username'] }} " >Join</button>
+          <button class="join" id="{{ item['username'] }}" >Join</button>
         </div>
         <hr class="{{ item['username'] }}-el"/>
       {% endfor %}
@@ -21,36 +21,42 @@
     <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
     <script type="text/javascript" src="{{ url_for('static', path='/get_public_keys.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', path='/localstg.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', path='/board.js') }}"></script>
     <script>
-            var ws = new WebSocket(`ws://localhost:8000/ws`);
             ws.onopen = function(event) {
-                ws.send(`{{ mson|safe }}`);
-            };
+              ws.send(`{{ mson|safe }}`);
+            };      
             ws.onmessage = function(event) {
-                data = JSON.parse(event.data)
+              data = JSON.parse(event.data)
+              console.log(data);
 
-                if (data["method"] === "user_conn") {
-                  document.querySelector("#users").innerHTML += `
+              if (data["method"] === "user_conn") {
+                console.log("baho");
+                document.querySelector("#users").innerHTML += `
                   <div class="user ${data["payload"]}-el">
                     <h4>${data["payload"]}</h4>
                     <button class="join" id="${data["payload"]}">Join</button>
                   </div>
                   <hr class="${data["payload"]}-el" />
-                  `;
-                } else if (data["method"] === "user_disconn") {
-                  let elements = document.querySelectorAll(`.${data["payload"]}-el`);
-                  elements.forEach(element => {
-                    element.remove();
-                  });
-                }
+                `;
+              } else if (data["method"] === "user_disconn") {
+                let elements = document.querySelectorAll(`.${data["payload"]}-el`);
+                elements.forEach(element => {
+                  element.remove();
+                });
+              } else if (data["method"] === "connect") {
+                accept(data["payload"]);
+              } else if (data["method"] === "confirm") {
+                confirm(data["payload"]);
+              } else if (data["method"] === "justify") {
+                justify(data["payload"]);
+              }
 
-                console.log(event.data)
+            console.log(event.data);
 
-            };
-            
+            }; 
             removeDataOnUnload("serverPublicKeys");
     </script>
-    <script type="text/javascript" src="{{ url_for('static', path='/join.js') }}"></script>
 
   </body>
 </html>

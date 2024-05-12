@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.api.user.usecases import user_login_usecase, register_usecase
-from src.schemas import TokenSchema
+from src.core.middleware import auth_required
+from src.db.repositories import public_keys_repository
+from src.schemas import TokenSchema, PublicKeySchema, PublicKeys
 
 router = APIRouter()
 
@@ -36,4 +38,16 @@ async def register(data: OAuth2PasswordRequestForm = Depends()):
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail=result.message,
+    )
+
+
+@router.post("/public-key")
+@auth_required
+async def post_public_key(item: PublicKeySchema, request: Request):
+    public_keys_repository.create(
+        PublicKeys(
+            public_key_exp=item.public_key_exp,
+            public_key_n=item.public_key_n,
+            user_id=request.user.user_id,
+        )
     )

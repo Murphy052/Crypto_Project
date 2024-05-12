@@ -31,40 +31,43 @@ class RSA:
         self._private_key = (d, n)
 
     def encrypt(self, text: str):
-        bytesarray = bytearray(text.encode('UTF-8'))
-        integer = int.from_bytes(bytesarray, byteorder='big', signed=False)
-        r = MathTools.fast_exponentiation(integer, self._public_key[0], self._public_key[1])
-        return r
+        cipher_blocks = []
+        for i in range(0, len(text), self._chunk_size):
+            block = text[i: i + self._chunk_size]
+            bytesarray = bytearray(block.encode('UTF-8'))
+            integer = int.from_bytes(bytesarray, byteorder='big', signed=False)
+            r = MathTools.fast_exponentiation(integer, self._public_key[0], self._public_key[1])
+            cipher_blocks.append(str(r))
+        return " ".join(cipher_blocks)
 
     def decrypt(self, cipher: str):
-        integer = int(cipher)
-        integer = MathTools.fast_exponentiation(integer, self._private_key[0], self._private_key[1])
-        bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
-        return bytesarray.decode('UTF-8')
+        decrypted_blocks = []
+        cipher_blocks = cipher.split(" ")
+        for block in cipher_blocks:
+            integer = int(block)
+            integer = MathTools.fast_exponentiation(integer, self._private_key[0], self._private_key[1])
+            bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
+            decrypted_blocks.append(bytesarray.decode('UTF-8'))
+        return "".join(decrypted_blocks)
 
     @staticmethod
-    def encrypt_with_key(text: str, key: Tuple[int, int]):
-        bytesarray = bytearray(text.encode('UTF-8'))
-        integer = int.from_bytes(bytesarray, byteorder='big', signed=False)
-        r = MathTools.fast_exponentiation(integer, key[0], key[1])
-        return r
+    def encrypt_with_key(text: str, key: Tuple[int, int], chunk_size: int):
+        cipher_blocks = []
+        for i in range(0, len(text), chunk_size):
+            block = text[i: i + chunk_size]
+            bytesarray = bytearray(block.encode('UTF-8'))
+            integer = int.from_bytes(bytesarray, byteorder='big', signed=False)
+            r = MathTools.fast_exponentiation(integer, key[0], key[1])
+            cipher_blocks.append(str(r))
+        return " ".join(cipher_blocks)
 
     @staticmethod
-    def decrypt_with_key(cipher: str, key: Tuple[int, int]):
-        integer = int(cipher)
-        integer = MathTools.fast_exponentiation(integer, key[0], key[1])
-        bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
-        return bytesarray.decode('UTF-8')
-
-
-def main() -> None:
-    rsa: RSA = RSA(512)
-    t = "Cryptography is Interesting!"
-    r = rsa.encrypt(t)
-    print(r)
-    r = rsa.decrypt(str(r))
-    print(r)
-
-
-if __name__ == "__main__":
-    main()
+    def decrypt_with_key(cipher: str, key: Tuple[int, int], chunk_size: int):
+        decrypted_blocks = []
+        cipher_blocks = cipher.split(" ")
+        for block in cipher_blocks:
+            integer = int(block)
+            integer = MathTools.fast_exponentiation(integer, key[0], key[1])
+            bytesarray = integer.to_bytes(length=(8 + (integer + (integer < 0)).bit_length()) // 8, byteorder='big', signed=False)
+            decrypted_blocks.append(bytesarray.decode('UTF-8'))
+        return "".join(decrypted_blocks)

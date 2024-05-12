@@ -24,7 +24,7 @@ async def render_board(request: Request):
     users_data = [conn.user.__dict__ for conn in manager.active_connections]
 
     return templates.TemplateResponse(
-        "board.html", {"request": request, "data": users_data, "mson": '{"method": "user_conn", '+'"payload": "'+request.user.username+'"}'}
+        "board.html", {"request": request, "data": users_data, "mson": '{"method": "user_conn", '+'"payload": "'+request.user.username+'"}', "username": {request.user.username}}
     )
 
 

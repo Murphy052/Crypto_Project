@@ -38,7 +38,8 @@ app.mount("/static", StaticFiles(directory="src/client/static"), name="static")
 @app.get("/test")
 @auth_required
 async def test_endpoint(request: Request):
-    return public_keys_repository.get_obj_or_none(user_id=request.user.user_id)
+    print(s := public_keys_repository.get_keys_pair_by_username(username="Iguliyev"))
+    return s
 
 
 app.include_router(routes, tags=["api"])
